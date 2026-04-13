@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "medicines",
+  "info": {
+    "singularName": "medicine",
+    "pluralName": "medicines",
+    "displayName": "MEDICINES"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "BrandName": {
+      "type": "string",
+      "required": true
+    },
+    "GenericName": {
+      "type": "string",
+      "required": true
+    },
+    "DosageForm": {
+      "type": "enumeration",
+      "enum": [
+        "Tablet",
+        "Syrup"
+      ]
+    },
+    "Manufacturer": {
+      "type": "string"
+    },
+    "Strength": {
+      "type": "string"
+    },
+    "medicine_category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::medicine-category.medicine-category",
+      "inversedBy": "medicines"
+    },
+    "stock_inventories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::stock-inventory.stock-inventory",
+      "mappedBy": "medicine"
+    },
+    "purchase_order_lines": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::purchase-order-line.purchase-order-line",
+      "mappedBy": "medicine"
+    }
+  }
+}

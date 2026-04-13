@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "medicine_categories",
+  "info": {
+    "singularName": "medicine-category",
+    "pluralName": "medicine-categories",
+    "displayName": "MEDICINE_CATEGORIES"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CategoryName": {
+      "type": "string",
+      "required": false,
+      "unique": true
+    },
+    "Description": {
+      "type": "blocks"
+    },
+    "StorageRequirements": {
+      "type": "string"
+    },
+    "RequiresPrescription": {
+      "type": "boolean",
+      "default": false
+    },
+    "ControlledSubstance": {
+      "type": "boolean",
+      "default": false
+    },
+    "medicines": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::medicine.medicine",
+      "mappedBy": "medicine_category"
+    }
+  }
+}

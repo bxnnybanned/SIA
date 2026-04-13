@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "purchase_orders",
+  "info": {
+    "singularName": "purchase-order",
+    "pluralName": "purchase-orders",
+    "displayName": "PURCHASE_ORDERS"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "OrderDate": {
+      "type": "date",
+      "required": true
+    },
+    "TotalAmount": {
+      "type": "decimal"
+    },
+    "PaymentStatus": {
+      "type": "enumeration",
+      "enum": [
+        "Pending",
+        "Paid",
+        "Partial",
+        "Overdue"
+      ]
+    },
+    "ReceivedDate": {
+      "type": "date"
+    },
+    "supplier": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::supplier.supplier",
+      "inversedBy": "purchase_orders"
+    },
+    "purchase_order_lines": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::purchase-order-line.purchase-order-line",
+      "mappedBy": "purchase_order"
+    }
+  }
+}
