@@ -1,10 +1,36 @@
+const fs = require('node:fs');
 const path = require('node:path');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 
-async function startStrapi(projectRoot) {
+function ensureAdminBuild(projectRoot, cliPath, env) {
+  const adminIndexPath = path.join(projectRoot, 'build', 'index.html');
+
+  if (fs.existsSync(adminIndexPath)) {
+    return;
+  }
+
+  const result = spawnSync(process.execPath, [cliPath, 'build'], {
+    cwd: projectRoot,
+    env,
+    stdio: 'inherit',
+  });
+
+  if (result.signal) {
+    process.kill(process.pid, result.signal);
+    return;
+  }
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}
+
+async function startStrapi(projectRoot, cliPath, env) {
   const { createStrapi } = require('@strapi/core');
 
   try {
+    ensureAdminBuild(projectRoot, cliPath, env);
+
     await createStrapi({
       appDir: projectRoot,
       distDir: projectRoot,
@@ -26,7 +52,7 @@ const env = {
 
 if (command === 'start') {
   process.env = env;
-  startStrapi(projectRoot);
+  startStrapi(projectRoot, cliPath, env);
   return;
 }
 
