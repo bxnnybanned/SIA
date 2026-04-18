@@ -1,9 +1,14 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawn, spawnSync } = require('node:child_process');
+const { spawn } = require('node:child_process');
 
-function ensureAdminBuild(projectRoot, cliPath, env) {
+function syncAdminBuild(projectRoot) {
   const adminIndexPath = path.join(projectRoot, 'build', 'index.html');
+
+  if (!fs.existsSync(adminIndexPath)) {
+    return;
+  }
+
   const fallbackBuildDir = path.join(
     projectRoot,
     'node_modules',
@@ -14,36 +19,13 @@ function ensureAdminBuild(projectRoot, cliPath, env) {
     'server',
     'build'
   );
-
-  if (fs.existsSync(adminIndexPath)) {
-    fs.cpSync(path.join(projectRoot, 'build'), fallbackBuildDir, { recursive: true, force: true });
-    return;
-  }
-
-  const result = spawnSync(process.execPath, [cliPath, 'build'], {
-    cwd: projectRoot,
-    env,
-    stdio: 'inherit',
-  });
-
-  if (result.signal) {
-    process.kill(process.pid, result.signal);
-    return;
-  }
-
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
-  }
-
   fs.cpSync(path.join(projectRoot, 'build'), fallbackBuildDir, { recursive: true, force: true });
 }
 
-async function startStrapi(projectRoot, cliPath, env) {
+async function startStrapi(projectRoot) {
   const { createStrapi } = require('@strapi/core');
 
   try {
-    ensureAdminBuild(projectRoot, cliPath, env);
-
     await createStrapi({
       appDir: projectRoot,
       distDir: projectRoot,
@@ -65,7 +47,7 @@ const env = {
 
 if (command === 'start') {
   process.env = env;
-  startStrapi(projectRoot, cliPath, env);
+  startStrapi(projectRoot);
   return;
 }
 
@@ -79,6 +61,15 @@ child.on('exit', (code, signal) => {
   if (signal) {
     process.kill(process.pid, signal);
     return;
+  }
+
+  if (code === 0 && command === 'build') {
+    try {
+      syncAdminBuild(projectRoot);
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
   }
 
   process.exit(code ?? 0);
