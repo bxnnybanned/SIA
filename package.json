@@ -4,7 +4,7 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
-    "build": "node scripts/run-strapi.js build && node scripts/sync-admin-build.js",
+    "build": "node scripts/build-strapi.js && node scripts/sync-admin-build.js",
     "console": "node scripts/run-strapi.js console",
     "deploy": "node scripts/run-strapi.js deploy",
     "dev": "node scripts/run-strapi.js develop",
